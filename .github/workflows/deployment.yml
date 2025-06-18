@@ -1,0 +1,120 @@
+name: Build & Deploy Videoflix
+
+on: 
+  #push:
+  #  branches: [ "main" ]
+  
+  workflow_dispatch:
+
+env:
+  IMAGE_OWNER: ${{ vars.IMAGE_OWNER }}
+
+jobs:
+  # build container images in GitHub Actions Runner and push build images in ghcr
+  build:
+    runs-on: ubuntu-latest
+    permissions: 
+      packages: write  # for GHCR-Push
+      contents: read
+    steps:
+      - name: Clone the repository into the GitHub Actions Runner
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3.10.0
+      
+      - name: Log in to the GitHub Container Registry (GHCR)
+        uses: docker/login-action@v3.3.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Create .env-file with required environment variables
+        env:
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          DEBUG: ${{ vars.DEBUG }}
+          BACKEND_EXTERNAL_PORT: ${{ vars.BACKEND_EXTERNAL_PORT }}
+          IP_ADDRESS_VM: ${{ vars.IP_ADDRESS_VM }}
+          CORS_ALLOWED_ORIGINS: ${{ vars.CORS_ALLOWED_ORIGINS }}
+          DJANGO_SUPERUSER_USERNAME: ${{ secrets.DJANGO_SUPERUSER_USERNAME }}
+          DJANGO_SUPERUSER_PASSWORD: ${{ secrets.DJANGO_SUPERUSER_PASSWORD }}
+          DJANGO_SUPERUSER_EMAIL: ${{ secrets.DJANGO_SUPERUSER_EMAIL }}
+          FRONTEND_EXTERNAL_PORT: ${{ vars.FRONTEND_EXTERNAL_PORT }}
+          IMAGE_OWNER: ${{ vars.IMAGE_OWNER }}
+          GMAIL_PWD: ${{ secrets.GMAIL_PWD }}
+          EMAIL_SENDER: ${{ secrets.EMAIL_SENDER }}
+          ACTIVATION_URL: ${{ vars.ACTIVATION_URL }}
+          INTERNAL_IP: ${{ vars.INTERNAL_IP }}
+          REDIS_HOST: ${{ vars.REDIS_HOST }}
+          REDIS_PORT: ${{ vars.REDIS_PORT }}
+          REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+          POSTGRES_DB: ${{ vars.POSTGRES_DB }}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_HOST: ${{ vars.POSTGRES_HOST }}
+          POSTGRES_PORT: ${{ vars.POSTGRES_PORT }}
+        run: env > .env
+
+      - name: Videoflix Frontend - build docker image in runner and push to registry
+        uses: docker/build-push-action@v6.14.0
+        with:
+          context: ./videoflix_frontend
+          file: ./videoflix_frontend/Dockerfile
+          push: true
+          tags: ghcr.io/${{ env.IMAGE_OWNER }}/videoflix-frontend:latest
+          no-cache: true
+      
+      - name: Videoflix Backend - build docker image in runner and push to registry
+        uses: docker/build-push-action@v6.14.0
+        with:
+          context: ./videoflix
+          file: ./videoflix/Dockerfile
+          push: true
+          tags: ghcr.io/${{ env.IMAGE_OWNER }}/videoflix-backend:latest
+          no-cache: true
+      
+      - name: Store the deployment files for the next job
+        uses: actions/upload-artifact@v4.6.1
+        with:
+          name: deploy-files
+          path: |
+            .env
+            docker-compose.yaml
+          include-hidden-files: true
+
+  # delivers deploy files to the target server and starts the container
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Download the deployment files into GitHubActions Runner
+        uses: actions/download-artifact@v4.1.8
+        with:
+          name: deploy-files
+
+      - name: Transfer the deployment files via SCP to target server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: '.env,docker-compose.yaml'
+          target: ${{ secrets.DEPLOY_DIR }}
+          port: ${{ secrets.SSH_PORT }}
+          overwrite: true
+
+      - name: Start the Docker containers on the target server via SSH 
+        uses: appleboy/ssh-action@v1.2.1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            cd ${{ secrets.DEPLOY_DIR }}
+            docker compose down --remove-orphans
+            docker system prune -a -f
+            docker compose up -d
