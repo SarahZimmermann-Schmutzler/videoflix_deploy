@@ -18,7 +18,7 @@ services:
   backend:
     # for manual build process
     # build:
-      # context: ./videoflix
+      # context: ./videoflix_backend
       # dockerfile: Dockerfile
     # for build with GitHub Action
     image: ghcr.io/${IMAGE_OWNER}/videoflix-backend:latest

@@ -1,3 +1,6 @@
 [submodule "videoflix_frontend"]
 	path = videoflix_frontend
 	url = https://github.com/SarahZimmermann-Schmutzler/videoflix_frontend.git
+[submodule "videoflix_backend"]
+	path = videoflix_backend
+	url = https://github.com/SarahZimmermann-Schmutzler/videoflix_backend.git
