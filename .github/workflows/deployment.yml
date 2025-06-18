@@ -70,8 +70,8 @@ jobs:
       - name: Videoflix Backend - build docker image in runner and push to registry
         uses: docker/build-push-action@v6.14.0
         with:
-          context: ./videoflix
-          file: ./videoflix/Dockerfile
+          context: ./videoflix_backend
+          file: ./videoflix_backend/Dockerfile
           push: true
           tags: ghcr.io/${{ env.IMAGE_OWNER }}/videoflix-backend:latest
           no-cache: true
