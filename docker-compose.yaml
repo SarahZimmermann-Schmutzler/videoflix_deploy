@@ -39,6 +39,7 @@ services:
     env_file: .env
     environment:
       - PGDATA=/var/lib/postgresql/data
+      - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/postgresql/13/bin
     volumes:
       #- postgres_data:/var/lib/postgresql/data
       - db_data:/var/lib/postgresql/data
@@ -55,6 +56,7 @@ services:
 volumes:
   db_data:
   #postgres_data:
+    #external: true
     #name: videoflix-db-volume
 
 networks:
