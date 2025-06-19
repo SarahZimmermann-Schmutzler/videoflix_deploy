@@ -57,7 +57,6 @@ services:
 
 volumes:
   postgres_data:
-    external: true
     name: videoflix-db-volume
 
 networks:
