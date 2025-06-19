@@ -37,6 +37,8 @@ services:
     image: postgres:13
     container_name: videoflix-db
     env_file: .env
+    environment:
+      - PGDATA=/var/lib/postgresql/data
     volumes:
       #- postgres_data:/var/lib/postgresql/data
       - db_data:/var/lib/postgresql/data
