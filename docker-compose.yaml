@@ -30,6 +30,8 @@ services:
     depends_on:
       - db
       - redis
+    volumes:
+      - media_data:/app/media
     networks:
       - videoflix-network
 
@@ -58,6 +60,9 @@ volumes:
   postgres_data:
     external: true
     name: videoflix-db-volume
+  media_data:
+    external: true
+    name: videoflix-media-volume
 
 networks:
   videoflix-network:
