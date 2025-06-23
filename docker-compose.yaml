@@ -55,6 +55,20 @@ services:
     networks:
       - videoflix-network
 
+  rqworker:
+    image: ghcr.io/${IMAGE_OWNER}/videoflix-backend:latest
+    env_file: .env
+    container_name: videoflix-rqworker
+    command: python manage.py rqworker default
+    depends_on:
+      - backend
+      - redis
+    volumes:
+      - media_data:/app/media
+    networks:
+      - videoflix-network
+    restart: on-failure
+
 volumes:
   #db_data:
   postgres_data:
