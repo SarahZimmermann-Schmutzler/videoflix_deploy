@@ -44,7 +44,6 @@ services:
       - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/postgresql/13/bin
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      #- db_data:/var/lib/postgresql/data
     networks:
       - videoflix-network
   
@@ -70,7 +69,6 @@ services:
     restart: on-failure
 
 volumes:
-  #db_data:
   postgres_data:
     external: true
     name: videoflix-db-volume
