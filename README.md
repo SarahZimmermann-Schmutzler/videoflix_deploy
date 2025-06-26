@@ -38,13 +38,13 @@ This section provides a **minimal setup guide**. For detailed instructions and a
 1. Set the required **Actions secrets and variables**
    * See the full list [here](#usage)
 
-1. Create a **persistent volume** for PostgreSQL data on your remote server:
+1. Create a **persistent volume** for **PostgreSQL** data on your remote server:
 
    ```bash
    docker volume create videoflix-db-volume
    ```
 
-1. Create a **persistent volume** for media files on your remote server:
+1. Create a **persistent volume** for **media files** on your remote server:
 
    ```bash
    docker volume create videoflix-media-volume
@@ -96,7 +96,7 @@ This section provides a **minimal setup guide**. For detailed instructions and a
     | DEBUG | Set to True to enable debug mode for local development/testing; Set to False in production environments |
     | IP_ADDRESS_VM | Server IP address or Domain, added to the ALLOWED_HOSTS list in settings.py |
     | CORS_ALLOWED_ORIGINS | List of all hosts with their portnumbers, added to settings.py |
-    | ACTIVATION_URL | URL/IP address of the Frontend (similiar to value of IP_ADDRESS_VM) |
+    | ACTIVATION_URL | URL/IP address of the Frontend |
     | REDIS_HOST | Name of Redis service. The default is "redis" |
     | REDIS_PORT | Port number on which the Redis service is running. The default is 6379 |
     | POSTGRES_DB | Name of the PostgreSQL database to be created and used by the application |
@@ -106,7 +106,7 @@ This section provides a **minimal setup guide**. For detailed instructions and a
     | BACKEND_EXTERNAL_PORT | External portnumber for backend container |
     | FRONTEND_EXTERNAL_PORT | External portnumber for frontend container |
 
-1. Create a **persistent volume** for PostgreSQL on your remote server:
+1. Create a **persistent volume** for **PostgreSQL** on your remote server:
 
    * To ensure your **data is not lost after container restarts**:
   
@@ -114,7 +114,7 @@ This section provides a **minimal setup guide**. For detailed instructions and a
       docker volume create videoflix-db-volume
       ```
 
-1. Create a **persistent volume** for media files on your remote server:
+1. Create a **persistent volume** for **media files** on your remote server:
 
    ```bash
    docker volume create videoflix-media-volume
@@ -124,14 +124,14 @@ This section provides a **minimal setup guide**. For detailed instructions and a
 
    * In the `deployment.yml`, the `workflow_dispatch` trigger is enabled, so the workflow must be triggered manually:
      * In the GitHub UI, you can find it under:
-       * **Actions > Build & Deploy Kenben > Run workflow**
+       * **Actions > Build & Deploy Videoflix > Run workflow**
 
    * <ins>Alternative</ins>: Enable **Auto-Deploy on Push** if you'd prefer automatic deployment when pushing to the main branch:
      * [Clone](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) the project to your platform:
        * <ins>Example</ins>: Clone the repo e.g. using an SSH-Key:  
 
           ```bash
-          git clone git@github.com:Your-Name/videoflix_deploy.git
+          git clone git@github.com:SarahZimmermann-Schmutzler/videoflix_deploy.git
           ```
 
        * Navigate to the **project directory**:
@@ -198,4 +198,4 @@ The frontend was developed using **Angular** with the goal of replicating the **
   * Shows **detailed information** about the selected video
   * Allows the user to **choose between available resolutions**
   * Embedded **video player** for seamless streaming
-  ![video_detail](https://raw.githubusercontent.com/SarahZimmermann-Schmutzler/videoflix_deploy/main/img_github/video_detial.png)
+  ![video_detail](https://raw.githubusercontent.com/SarahZimmermann-Schmutzler/videoflix_deploy/main/img_github/video_detail.png)
